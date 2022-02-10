@@ -8,6 +8,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 from mongoengine.connection import connect
+from bokeh.settings import bokehjsdir, settings
 
 from core_main_app.utils.logger.logger_utils import (
     set_generic_handler,
@@ -16,6 +17,8 @@ from core_main_app.utils.logger.logger_utils import (
 )
 from .core_settings import *
 import os
+
+settings.resources = 'inline'
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -94,6 +97,8 @@ INSTALLED_APPS = (
     "tz_detect",
     "defender",
     "captcha",
+    'channels',
+    'bokeh.server.django',
     # Core apps
     "core_main_app",
     "core_exporters_app",
@@ -117,7 +122,6 @@ INSTALLED_APPS = (
     "core_dashboard_common_app",
     "core_file_preview_app",
     "core_linked_records_app",
-    "core_gps_visualization_app",
     # modules
     "core_module_blob_host_app",
     "core_module_remote_blob_host_app",
@@ -129,6 +133,7 @@ INSTALLED_APPS = (
     "core_module_text_area_app",
     # Local apps
     "tdcs_home",
+    "core_gps_visualization_app"
 )
 
 MIDDLEWARE = (
@@ -165,7 +170,7 @@ TEMPLATES = [
 
 ROOT_URLCONF = "tdcs.urls"
 
-WSGI_APPLICATION = "tdcs.wsgi.application"
+ASGI_APPLICATION = 'tdcs.routing.application'
 
 
 # Internationalization
@@ -194,7 +199,10 @@ STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.FileSystemFinder",
 )
 
-STATICFILES_DIRS = ("static",)
+STATICFILES_DIRS = (
+    "static",
+    bokehjsdir(),
+)
 
 # Password Validators
 AUTH_PASSWORD_VALIDATORS = [
