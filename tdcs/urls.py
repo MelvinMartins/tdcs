@@ -18,6 +18,14 @@ from django.urls import re_path
 
 from core_parser_app.tools.modules.discover import discover_modules
 
+from bokeh.server.django import autoload, static_extensions
+from django.apps import apps
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+
+import core_gps_visualization_app.pn_app as gps_plots_app
+
+pn_app_config = apps.get_app_config('bokeh.server.django')
+
 urlpatterns = [
     re_path(r"^admin/", admin.site.urls),
     re_path(r"^admin/defender/", include("defender.urls")),
@@ -26,6 +34,7 @@ urlpatterns = [
     re_path(r"^home/", include("tdcs_home.urls")),
     re_path(r"^", include("core_website_app.urls")),
     re_path(r"^curate/", include("core_curate_app.urls")),
+
     re_path(r"^gps_visualization/", include("core_gps_visualization_app.urls")),
     re_path(r"^composer/", include("core_composer_app.urls")),
     re_path(r"^parser/", include("core_parser_app.urls")),
@@ -52,6 +61,16 @@ urlpatterns = [
     re_path(r"^", include("core_module_text_area_app.urls")),
     re_path(r"^pid/", include("core_linked_records_app.urls")),
 ]
+
+bokeh_apps = [
+    autoload("gps_visualization/load-initial-plots", gps_plots_app.app),
+    autoload("gps_visualization/update-chart", gps_plots_app.app),
+    autoload("gps_visualization/select-chart-dropdown-form", gps_plots_app.app),
+    autoload("gps_visualization/select-time-range-dropdown-form", gps_plots_app.app),
+]
+
+urlpatterns += static_extensions()
+urlpatterns += staticfiles_urlpatterns()
 
 # TODO: see if we can automate the discovery and run it from parser app
 discover_modules(urlpatterns)
